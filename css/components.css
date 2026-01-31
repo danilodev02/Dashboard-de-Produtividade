@@ -1,15 +1,45 @@
-.menu ul {
-    display: grid;
+.menu {
+    width: 100%;
+    height: 100%;
 
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: 2fr;
+    display: flex;
+    align-items: center;
+
     
+}
+
+.menu ul {
+    width: 100%;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+
     list-style: none;
+}
+
+.menu li {
+    height: fit-content;
 }
 
 .menu ul a {
     display: flex;
     justify-content: center;
     align-items: center;
+
+    
+}
+
+.menu ul a svg {
+    width: 70%;
+}
+
+button {
+    border: 1px solid var(--border);
+    background-color: var(--bg);
+
+    padding: 10px;
+    border-radius: 50px;
 }
 
