@@ -1,10 +1,12 @@
 :root {
     --bg: #fff;
     --color: #000;
+    --border: #929292;
 }
 
 [data-theme='dark'] {
     --bg: #000;
-    --color: #fff
+    --color: #fff;
+    --border: #484848; 
 }
 
