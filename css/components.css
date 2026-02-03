@@ -35,6 +35,23 @@
     width: 70%;
 }
 
+.menu a {
+    color: var(--color);
+}
+
+.menu svg,
+.container-task svg,
+.button-achiments svg {
+    color: var(--color);
+}
+
+.menu svg *,
+.container-task svg *,
+.button-achiments svg * {
+    fill: currentColor !important;
+    stroke: currentColor !important;
+}
+
 
 
 

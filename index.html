@@ -10,8 +10,13 @@
     <link rel="stylesheet" href="css/themes.css">
 </head>
 <body>
-    <button>
-        <a href="pages/task.html">INICIAR DASHBOARD</a>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Modo Escuro">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M21 15.5A9 9 0 1 1 8.5 3a7 7 0 1 0 12.5 12.5Z" fill="currentColor"/>
+        </svg>
+        <span class="visually-hidden theme-toggle__label">Modo Escuro</span>
     </button>
+    <a class="btn" href="pages/task.html">INICIAR DASHBOARD</a>
+    <script src="js/theme.js" defer></script>
 </body>
 </html>
