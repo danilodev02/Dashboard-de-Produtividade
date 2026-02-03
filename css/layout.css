@@ -1,39 +1,4 @@
-body {
-    width: 100%;
-    height: 100vh;
-}
 
-header {
-    background-color: var(--bg);
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-
-    z-index: 1000;
-
-    width: 20%;
-    height: 12%;
-
-    border: 1px var(--border) solid;
-
-    display: flex;
-    flex-direction: row;
-
-    justify-content: center;
-    align-items: center;
-
-    border-radius: 50px 50px 0 0;
-}
-
-main {
-    width: 100%;
-    height: 100%;
-
-    display: flex;
-    justify-content: center;
-    align-items: end;
-}
 
 .container-task {
     padding: 20px 20px 0 20px;
@@ -58,6 +23,24 @@ main {
     position: relative;
 }
 
-.container-task * {
-    box-sizing: border-box;
+.container-profile {
+    display: grid;
+    grid-template-areas: 
+    'container-image container-image container-image'
+    'container-bio container-bio container-bio'
+    'container-bio container-bio container-bio'
+    ;
+
+    gap: 10px;
+    
+    border: 1px solid var(--border);
+    border-radius: 15px;
+
+    width: 53%;
+    height: 90%;
+
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 35% auto auto;
+
+    overflow: hidden;
 }
