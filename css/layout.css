@@ -4,10 +4,13 @@ body {
 }
 
 header {
+    background-color: var(--bg);
     position: absolute;
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);
+
+    z-index: 1000;
 
     width: 20%;
     height: 12%;
@@ -50,7 +53,7 @@ main {
     gap: 20px;
 
     grid-template-columns: 1fr 1fr 1fr 1fr;
-    grid-template-rows: 1fr 1fr 7fr;
+    grid-template-rows: auto auto 1fr;
 
     position: relative;
 }
