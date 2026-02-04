@@ -1,4 +1,11 @@
+.container-index {
+    width: 100%;
+    height: 100%;
 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
 .container-task {
     padding: 20px 20px 0 20px;

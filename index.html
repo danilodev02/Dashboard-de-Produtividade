@@ -16,7 +16,38 @@
         </svg>
         <span class="visually-hidden theme-toggle__label">Modo Escuro</span>
     </button>
-    <a class="btn" href="pages/task.html">INICIAR DASHBOARD</a>
+
+    <div class="container-index">
+        <form id="conectar" action=""  class="hidden">
+            <h1>CONECTAR</h1>
+
+            <label for="email_conectar">Email</label>
+            <input type="email" id="email_conectar" name="email_conectar" required>
+
+            <label for="password_conectar">Senha</label>
+            <input type="password" id="password_conectar" name="password_conectar" required>
+
+            <button type="submit">ENTRAR</button>
+            <p>Não tem uma conta? Clique <a href="#cadastro">aqui</a></p>
+        </form>
+        <form id="cadastro" action="">
+            <h1>CADASTRO</h1>
+
+            <label for="email_cadastro">Email</label>
+            <input type="email" id="email_cadastro" name="email_cadastro" required>
+
+            <label for="password_cadastro">Senha</label>
+            <input type="password" id="password_cadastro" name="password_cadastro" required>
+
+            <label for="confirm">Confirmar senha</label>
+            <input type="password" id="confirm" name="confirm" required>
+
+            <button type="submit">CADASTRAR</button>
+            <p>Já tem uma conta? Clique <a href="#conectar">aqui</a></p>
+        </form>
+    </div>
+    
+    <script src="js/conectar.js" defer></script>
     <script src="js/theme.js" defer></script>
 </body>
 </html>

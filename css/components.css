@@ -52,8 +52,80 @@
     stroke: currentColor !important;
 }
 
+/* Index Page Components */
 
+.container-index form {
+    width: 40%;
+    height: 70%;
 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    flex-direction: column;
+
+    border: 1px solid var(--border);
+    border-radius: 15px;
+
+    padding: 4.5%;
+    padding-left: 6%;
+    padding-right: 6%;
+}
+
+.container-index form input, .container-index form label {
+    width: 100%;
+}
+
+.container-index form input, .container-index form button {
+    height: 15%;
+    padding-left: 10px;
+}
+
+.container-index form input {
+    background-color: var(--bg);
+    color: var(--color);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+}
+
+.container-index #cadastro{
+    padding: 2%;
+    padding-left: 6%;
+    padding-right: 6%;
+}
+
+.container-index #cadastro h1 {
+    margin-bottom: 10px;
+}
+
+.container-index form label {
+    margin-top: 15px;
+    margin-bottom: 5px;
+}
+
+.container-index form h1 {
+    margin-bottom: 20px;
+}
+
+.container-index form button {
+    margin-top: 30px;
+    width: 60%;
+    font-size: 15px;
+    color: var(--color);
+}
+
+.container-index form p {
+    margin-top: 15px;
+}
+
+.container-index form p a {
+    text-decoration: underline;
+    color: blue;
+}
+
+.container-index .hidden {
+    display: none;
+}
 
 /* Task Page Components */
 

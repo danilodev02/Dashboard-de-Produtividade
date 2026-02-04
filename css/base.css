@@ -24,6 +24,11 @@ a {
     text-decoration: none;
 }
 
+label, p {
+    font-family: "Inter", sans-serif;
+    color: var(--color);
+}
+
 header {
     background-color: var(--bg);
     position: absolute;
@@ -83,8 +88,8 @@ button {
     top: 12px;
     left: 12px;
 
-    width: 24px;
-    height: 24px;
+    width: 30px;
+    height: 30px;
     padding: 0;
 
     display: inline-flex;
@@ -100,8 +105,8 @@ button {
 }
 
 .theme-toggle svg {
-    width: 16px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
     display: block;
 }
 
