@@ -137,39 +137,38 @@
     align-items: center;
 
     width: 100%;
-
 }
 
-.container-task .shop-button {
+.container-task .buttons-top {
     grid-area: button;
-    width: 25%;
+    width: 100%;
     height: 100%;
 
     border-radius: 10px;
 
-    position: absolute;
-
-    border: 1px solid var(--border);
-
-    top: 50%;
-    right: 0;
-    transform: translateY(-50%);
+    gap: 12px;
 
     display: flex;
-    justify-content: center;
+    justify-content: end;
     align-items: center;
 }
 
-.container-task .shop-button svg {
-    height: 70%;
+
+.container-task .buttons-top a{
+    display: flex;
+    width: 30%;
+    height: 80%;
+    padding: 5px;
+    justify-content: center;
+
+    border: 1px solid var(--border);
+    border-radius: 5px;
 }
 
-.container-task .shop-button a{
-    display: flex;
-    width: 100%;
+.container-task .buttons-top a svg {
     height: 100%;
-    padding: 0;
 }
+
 
 
 .container-task .container-bar {

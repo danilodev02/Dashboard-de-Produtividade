@@ -104,9 +104,36 @@ button {
     cursor: pointer;
 }
 
+.logout-button {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+
+    width: 30px;
+    height: 30px;
+    padding: 0;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid var(--border);
+    background-color: var(--bg);
+    color: var(--color);
+
+    border-radius: 999px;
+    cursor: pointer;
+}
+
 .theme-toggle svg {
     width: 20px;
     height: 20px;
+    display: block;
+}
+
+.logout-button svg {
+    width: 18px;
+    height: 18px;
     display: block;
 }
 

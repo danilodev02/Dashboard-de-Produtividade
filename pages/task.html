@@ -16,6 +16,14 @@
         </svg>
         <span class="visually-hidden theme-toggle__label">Modo Escuro</span>
     </button>
+    <button id="logout-button" class="logout-button" type="button" aria-label="Sair da conta">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M10 6H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M15 16l4-4-4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M19 12H10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="visually-hidden">Sair da conta</span>
+    </button>
     <header>
         <nav class="menu">
             <ul>
@@ -59,12 +67,20 @@
     <main>
         <section class="container-task">
             <h1 class="component-task container-title">TAREFAS</h1>
-            <a href="" class="component-task shop-button">
-                <svg width="44" height="54" viewBox="0 0 44 54" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M2.07518 18.4505C2.23361 15.8102 4.42109 13.75 7.06621 13.75H36.9339C39.5791 13.75 41.7666 15.8102 41.925 18.4506L43.682 47.7363C43.8545 50.6103 41.5702 53.0357 38.691 53.0357H5.309C2.42982 53.0357 0.145532 50.6103 0.317979 47.7362L2.07518 18.4505Z" fill="black"/>
-                    <path d="M35.5 13.75C35.5 21.3439 29.3439 27.5 21.75 27.5C14.1561 27.5 8 21.3439 8 13.75C8 6.15608 14.1561 0 21.75 0C29.3439 0 35.5 6.15608 35.5 13.75ZM13.1087 13.75C13.1087 18.5224 16.9776 22.3913 21.75 22.3913C26.5224 22.3913 30.3913 18.5224 30.3913 13.75C30.3913 8.97756 26.5224 5.10873 21.75 5.10873C16.9776 5.10873 13.1087 8.97756 13.1087 13.75Z" fill="black"/>
-                </svg>
-            </a>
+            <div class="component-task buttons-top">
+                <a href="">
+                    <svg width="58" height="58" viewBox="0 0 58 58" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect y="24" width="58" height="10" rx="5" fill="#0A0A0A"/>
+                        <rect x="24" y="58" width="58" height="10" rx="5" transform="rotate(-90 24 58)" fill="#0A0A0A"/>
+                    </svg>
+                </a>
+                <a href="">
+                    <svg width="44" height="54" viewBox="0 0 44 54" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M2.07518 18.4505C2.23361 15.8102 4.42109 13.75 7.06621 13.75H36.9339C39.5791 13.75 41.7666 15.8102 41.925 18.4506L43.682 47.7363C43.8545 50.6103 41.5702 53.0357 38.691 53.0357H5.309C2.42982 53.0357 0.145532 50.6103 0.317979 47.7362L2.07518 18.4505Z" fill="black"/>
+                        <path d="M35.5 13.75C35.5 21.3439 29.3439 27.5 21.75 27.5C14.1561 27.5 8 21.3439 8 13.75C8 6.15608 14.1561 0 21.75 0C29.3439 0 35.5 6.15608 35.5 13.75ZM13.1087 13.75C13.1087 18.5224 16.9776 22.3913 21.75 22.3913C26.5224 22.3913 30.3913 18.5224 30.3913 13.75C30.3913 8.97756 26.5224 5.10873 21.75 5.10873C16.9776 5.10873 13.1087 8.97756 13.1087 13.75Z" fill="black"/>
+                    </svg>
+                </a>
+            </div>
             <div class="component-task container-bar">
                 <div class="button-div">
                     <button>
@@ -109,5 +125,6 @@
         </section>
     </main>
     <script src="../js/theme.js" defer></script>
+    <script src="../js/logout.js" defer></script>
 </body>
 </html>
