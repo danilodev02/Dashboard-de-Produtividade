@@ -39,18 +39,6 @@
     color: var(--color);
 }
 
-.menu svg,
-.container-task svg,
-.button-achiments svg {
-    color: var(--color);
-}
-
-.menu svg *,
-.container-task svg *,
-.button-achiments svg * {
-    fill: currentColor !important;
-    stroke: currentColor !important;
-}
 
 /* Index Page Components */
 
@@ -154,7 +142,7 @@
 }
 
 
-.container-task .buttons-top a{
+.container-task .buttons-top button{
     display: flex;
     width: 30%;
     height: 80%;
@@ -165,7 +153,7 @@
     border-radius: 5px;
 }
 
-.container-task .buttons-top a svg {
+.container-task .buttons-top button svg {
     height: 100%;
 }
 
@@ -257,11 +245,171 @@
     list-style: none;
 
     width: 100%;
-    height: 80px;
+    height: 125px;
+
+    padding: 10px;
 
     background-color: var(--bg);
     border: 1px solid var(--border);
     border-radius: 10px;
+
+    display: grid;
+
+    grid-template-areas: 
+    'card-task-top card-task-top card-task-top buttons-crud'
+    'title . . buttons-crud'
+    'info-task info-task info-task buttons-crud'
+    ;
+
+    grid-template-columns: 2fr 1fr 3fr 1fr;
+    grid-template-rows: 1fr 2fr 1fr;
+    place-items: center;
+}
+
+.container-task .container-list li .card-task-top {
+    display: flex;
+
+    grid-area: card-task-top;
+
+    width: 100%;
+    height: 100%;
+
+    align-items: start;
+}
+
+.container-task .container-list li .card-task-top p{
+    margin-right: 10px;
+}
+
+.container-task .container-list li h2 {
+    grid-area: title;
+
+    width: 100%;
+
+}
+
+.container-task .container-list li .buttons-crud {
+    display: grid;
+
+    grid-area: buttons-crud;
+
+    grid-template-areas: 
+    'finalizar finalizar'
+    'editar remover'
+    ;
+
+    width: auto;
+    height: auto;
+    gap: 10px;
+}
+
+.container-task .container-list li .buttons-crud #finalizar-task {
+    display: flex;
+
+    grid-area: finalizar;
+
+    border: 2px #99F87D solid;
+    color: #99F87D;
+    font-weight: bold;
+
+    justify-content: center;
+    align-items: center;
+    font-size: 15px;
+}
+
+.container-task .container-list li .buttons-crud #edit-task {
+    display: flex;
+
+    grid-area: editar;
+}
+
+.container-task .container-list li .buttons-crud #remove-task {
+    display: flex;
+
+    grid-area: remover;
+
+    border: 2px #ff7678 solid;
+
+   
+}
+
+.container-task .container-list li .buttons-crud button {
+    display: flex;
+
+    height: 100%;
+
+    border-radius: 10px;
+    border: 2px solid var(--border);
+    padding: 5px;
+
+    justify-content: center;
+    align-items: center;
+}
+
+.container-task .container-list li .buttons-crud button svg {
+    height: 75%;
+}
+
+
+.container-task .container-list li .info-task {
+    display: flex;
+
+    width: 100%;
+    height: 100%;
+    grid-area: info-task;
+    align-items: end;
+}
+
+.container-task .container-list li .info-task div{
+    display: flex;
+    align-items: center;
+    
+
+    margin-right: 3%;
+}
+
+.container-task .container-list li .info-task div svg{
+    margin-right: 8px;
+}
+
+.add-panel,
+.edit-panel,
+.delete-warning {
+  position: absolute;
+  z-index: 10;
+  border: 1px solid var(--border);
+  background-color: var(--bg);
+}
+
+/* estados desligados */
+.add-panel { transform: translateY(-200%); }
+.edit-panel { transform: translateX(-200%); }
+.delete-warning { opacity: 0; pointer-events: none; }
+
+.add-panel {
+    width: 40%;
+    height: 70%;
+}
+
+.edit-panel {
+    width: 40%;
+    height: 50%;
+}
+
+/* quando ativo */
+#app.add-open .add-panel { transform: translateY(-25%); }
+#app.edit-open .edit-panel { transform: translateX(-40% ); }
+#app.delete-open .delete-warning {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* fundo perde foco */
+#app.add-open .container-task,
+#app.edit-open .container-task,
+#app.delete-open .container-task {
+  filter: blur(6px);
+  pointer-events: none;
 }
 
 /* Profile Page Components */ 
