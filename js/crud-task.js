@@ -19,3 +19,20 @@ function openDelete() {
 function closeAll() {
     app.classList.remove('add-open', 'edit-open', 'delete-open');
 }
+
+function Add_Form_Task() {
+    closeAllViewAdd()
+    app.classList.add('view-task-add');
+}
+
+function Filter_Form_Task() {
+    closeAllViewAdd()
+    app.classList.add('view-filter-add');
+}
+
+function closeAllViewAdd() {
+    app.classList.remove('view-filter-add', 'view-task-add');
+}
+
+
+
