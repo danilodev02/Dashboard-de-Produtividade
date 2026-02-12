@@ -1,122 +1,76 @@
-const DAILY_MISSION_POOL = [
-  {
-    id: 'finish_all_daily_tasks',
-    text: 'Concluir todas as tarefas diárias de hoje',
-    reward: { xp: 50, coins: 20 }
-  },
-  {
-    id: 'timer_25',
-    text: 'Usar o temporizador por pelo menos 25 minutos',
-    reward: { xp: 30, coins: 10 }
-  },
-  {
-    id: 'focus_60',
-    text: 'Manter o foco por 1 hora sem pausas',
-    reward: { xp: 60, coins: 25 }
-  }
-]
+const DB_KEY = "app_db";
 
-let user = {
-    xp: 0,
-    coins: 0,
-    focusTotal: 0
+function readDB() {
+  return JSON.parse(localStorage.getItem(DB_KEY)) || { version: 1, users: {} };;
+}
+
+function writeDB(db) {
+  localStorage.setItem(DB_KEY, JSON.stringify(db));
 } 
 
-function getTodayKey() {
-  return new Date().toISOString().split('T')[0] // YYYY-MM-DD
+function getLoggedEmail () {
+  return sessionStorage.getItem("usuario_logado"); // ex: "ana@email.com"
 }
 
-function generateDailyMissions() {
-  const today = getTodayKey()
-
-  return {
-    date: today,
-    missions: DAILY_MISSION_POOL.map(m => ({
-      ...m,
-      completed: false
-    }))
+function ensureUser(db, email) {
+  if(!db.users[email]) {
+    db.users[email] = {
+      profile: { email },
+      filters: [],
+      tasks: []
+    }
   }
 }
 
-let dailyMissions = generateDailyMissions();
-
-let mainTasks = []
-
-function AdicionarTask(title, estimatedMinutes) {
-  mainTasks.push({
-    id: crypto.randomUUID(),
-    title,
-    estimatedMinutes,
-    createdAt: Date.now(),
-    completed: false,
-    focusTime: 0
-  })
+function uid(prefix) {
+  return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
 }
 
-function EditarTask(id, data) {
-  const task = mainTasks.find(t => t.id === id)
-  if (!task) return
-  Object.assign(task, data)
-  if (data && data.completed === true) {
-    checkDailyMissions()
+function AddFilter(name, color = "#3B82F6") {
+  const email = getLoggedEmail();
+  if (!email || !name?.trim()) return null;
+
+  const db = readDB();
+  const user = ensureUser(db, email);
+  const normalized = name.trim().toLowerCase()
+
+  const exists = user.filters.some(f => f.name.toLowerCase() == normalized)
+  if (exists) return null;
+
+  const filter = {
+    id: uid("f"),
+    name: name.trim(),
+    color,
+    createdAt: new Date().toISOString()
+  };
+
+  user.filters.push(filter);
+  writeDB(db);
+  return filter;
+}
+
+function AddTask() {
+  const add_text_task = document.getElementById('add_text_task').value;
+  const add_date_task = document.getElementById('add_date_task').value;
+  
+  const add_priority = document.getElementById('add_priority').value;
+  const add_filter_task = document.getElementById('add_filter_task').value;
+
+  ({
+    text: add_text_task,
+    date: add_date_task,
+    priority: add_priority,
+    filter: add_filter_task,
+  });
+
+
+}
+document.getElementById("add_filter_form").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const input = document.getElementById("name_filter_add");
+  const filter = AddFilter(input.value);
+  if (filter) {
+    input.value = "";
+    renderFilterSelect();
   }
-}
-
-function DeletarTask(id) {
-  mainTasks = mainTasks.filter(t => t.id !== id)
-  checkDailyMissions()
-}
-
-let activeTaskId = null
-let focusStart = null
-
-function startFocus(taskId) {
-  activeTaskId = taskId
-  focusStart = Date.now()
-}
-
-function stopFocus() {
-  if (!activeTaskId || !focusStart) return
-
-  const elapsed = Math.floor((Date.now() - focusStart) / 60000)
-  const task = mainTasks.find(t => t.id === activeTaskId)
-
-  if (task) {
-    task.focusTime += elapsed
-    user.focusTotal += elapsed
-  }
-
-  activeTaskId = null
-  focusStart = null
-
-  checkDailyMissions()
-}
-
-function checkDailyMissions() {
-  dailyMissions.missions.forEach(mission => {
-    if (mission.completed) return
-
-    if (mission.id === 'timer_25' && user.focusTotal >= 25) {
-      completeMission(mission)
-    }
-
-    if (mission.id === 'focus_60' && user.focusTotal >= 60) {
-      completeMission(mission)
-    }
-
-    if (
-      mission.id === 'finish_all_daily_tasks' &&
-      mainTasks.length > 0 &&
-      mainTasks.every(t => t.completed)
-    ) {
-      completeMission(mission)
-    }
-  })
-}
-
-function completeMission(mission) {
-  mission.completed = true
-  user.xp += mission.reward.xp
-  user.coins += mission.reward.coins
-}
-
+});
