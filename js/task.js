@@ -1,25 +1,56 @@
+const usuarioLogado = sessionStorage.getItem("usuario_logado");
+if (!usuarioLogado) {
+    window.location.href = "../index.html";
+}
+
 const DB_KEY = "app_db";
+const LOG_PREFIX = "[task.js]";
+let selectedTaskId = null;
 
 function readDB() {
-  return JSON.parse(localStorage.getItem(DB_KEY)) || { version: 1, users: {} };;
+  try {
+    const raw = localStorage.getItem(DB_KEY);
+    const parsed = JSON.parse(raw);
+    const db = parsed || { version: 1, users: {} };
+    console.log(`${LOG_PREFIX} readDB ok`, {
+      hasRaw: Boolean(raw),
+      usersCount: Object.keys(db.users || {}).length
+    });
+    return db;
+  } catch (error) {
+    console.error(`${LOG_PREFIX} readDB erro ao parsear localStorage`, error);
+    return { version: 1, users: {} };
+  }
 }
 
 function writeDB(db) {
+  console.log(`${LOG_PREFIX} writeDB`, {
+    usersCount: Object.keys(db.users || {}).length
+  });
   localStorage.setItem(DB_KEY, JSON.stringify(db));
 }
 
 function getLoggedEmail () {
-  return sessionStorage.getItem("usuario_logado"); // ex: "ana@email.com"
+  const email = sessionStorage.getItem("usuario_logado");
+  console.log(`${LOG_PREFIX} getLoggedEmail`, { email });
+  return email; // ex: "ana@email.com"
 }
 
 function ensureUser(db, email) {
   if(!db.users[email]) {
+    console.log(`${LOG_PREFIX} ensureUser criando usuario`, { email });
     db.users[email] = {
       profile: { email },
       filters: [],
       tasks: []
-    }
+    };
   }
+  console.log(`${LOG_PREFIX} ensureUser ok`, {
+    email,
+    filters: db.users[email].filters.length,
+    tasks: db.users[email].tasks.length
+  });
+  return db.users[email];
 }
 
 function uid(prefix) {
@@ -27,15 +58,24 @@ function uid(prefix) {
 }
 
 function AddFilter(name, color = "#3B82F6") {
+  console.log(`${LOG_PREFIX} AddFilter start`, { name, color });
   const email = getLoggedEmail();
-  if (!email || !name?.trim()) return null;
+  if (!email || !name?.trim()) {
+    console.warn(`${LOG_PREFIX} AddFilter bloqueado`, {
+      reason: !email ? "sem_email_logado" : "nome_vazio"
+    });
+    return null;
+  }
 
   const db = readDB();
   const user = ensureUser(db, email);
   const normalized = name.trim().toLowerCase()
 
   const exists = user.filters.some(f => f.name.toLowerCase() == normalized)
-  if (exists) return null;
+  if (exists) {
+    console.warn(`${LOG_PREFIX} AddFilter bloqueado`, { reason: "filtro_duplicado" });
+    return null;
+  }
 
   const filter = {
     id: uid("f"),
@@ -46,34 +86,59 @@ function AddFilter(name, color = "#3B82F6") {
 
   user.filters.push(filter);
   writeDB(db);
+  console.log(`${LOG_PREFIX} AddFilter criado`, filter);
   return filter;
 }
 
 function renderFilterSelect() {
+  console.log(`${LOG_PREFIX} renderFilterSelect start`);
   const email = getLoggedEmail();
-  if (!email) return;
+  if (!email) {
+    console.warn(`${LOG_PREFIX} renderFilterSelect cancelado`, { reason: "sem_email_logado" });
+    return;
+  }
 
   const db = readDB();
   const user = ensureUser(db, email);
-  const select = document.getElementById("add_filter_task");
-  if (!select) return;
+  const select_add = document.getElementById("add_filter_task");
+  const select_edit = document.getElementById("edit_filter_task");
+  if (!select_add && !select_edit) {
+    console.warn(`${LOG_PREFIX} renderFilterSelect cancelado`, { reason: "select_nao_encontrado" });
+    return;
+  }
 
-  select.innerHTML = `<option value="">Sem filtro</option>`;
+  select_add.innerHTML = `<option value="">Sem filtro</option>`;
+  select_edit.innerHTML = `<option value="">Sem filtro</option>`;
+
   user.filters.forEach((f) => {
-    select.innerHTML += `<option value="${f.id}">${f.name}</option>`;
+    select_add.innerHTML += `<option value="${f.id}">${f.name}</option>`;
+    select_edit.innerHTML += `<option value="${f.id}">${f.name}</option>`;
   });
+  console.log(`${LOG_PREFIX} renderFilterSelect done`, {
+    options: user.filters.length + 1
+  });
+
 }
 
 function AddTask() {
+  console.log(`${LOG_PREFIX} AddTask start`);
   const email = getLoggedEmail();
-  if (!email) return null;
+  if (!email) {
+    console.warn(`${LOG_PREFIX} AddTask bloqueado`, { reason: "sem_email_logado" });
+    return null;
+  }
 
   const text = document.getElementById("add_text_task").value.trim();
   const date = document.getElementById("add_date_task").value;
   const priority = document.getElementById("add_priority").value;
   const filterId = document.getElementById("add_filter_task").value || null;
 
-  if (!text || !date) return null;
+  if (!text || !date) {
+    console.warn(`${LOG_PREFIX} AddTask bloqueado`, {
+      reason: !text ? "texto_vazio" : "data_vazia"
+    });
+    return null;
+  }
 
   const db = readDB();
   const user = ensureUser(db, email);
@@ -92,39 +157,163 @@ function AddTask() {
 
   user.tasks.push(task);
   writeDB(db);
+  console.log(`${LOG_PREFIX} AddTask criada`, task);
   return task;
 }
 
-function renderTasks() {
+function UpdateTask(taskId, updates) {
+  console.log(`${LOG_PREFIX} UpdateTask start`, { taskId, updates });
   const email = getLoggedEmail();
-  if (!email) return;
+  if (!email || !taskId) {
+    console.warn(`${LOG_PREFIX} UpdateTask bloqueado`, {
+      reason: !email ? "sem_email_logado" : "task_id_vazio"
+    });
+    return null;
+  }
+
+  const db = readDB();
+  const user = ensureUser(db, email);
+  const task = user.tasks.find((item) => item.id === taskId);
+  if (!task) {
+    console.warn(`${LOG_PREFIX} UpdateTask task nao encontrada`, { taskId });
+    return null;
+  }
+
+  if (typeof updates.text === "string") {
+    const trimmedText = updates.text.trim();
+    if (!trimmedText) {
+      console.warn(`${LOG_PREFIX} UpdateTask bloqueado`, { reason: "texto_vazio" });
+      return null;
+    }
+    task.text = trimmedText;
+  }
+
+  if (typeof updates.date === "string" && updates.date) {
+    task.date = updates.date;
+  }
+
+  if (typeof updates.priority === "string" && updates.priority) {
+    task.priority = updates.priority;
+  }
+
+  if ("filterId" in updates) {
+    task.filterId = updates.filterId || null;
+  }
+
+  task.updatedAt = new Date().toISOString();
+  writeDB(db);
+  console.log(`${LOG_PREFIX} UpdateTask done`, task);
+  return task;
+}
+
+function DeleteTask(taskId) {
+  console.log(`${LOG_PREFIX} DeleteTask start`, { taskId });
+  const email = getLoggedEmail();
+  if (!email || !taskId) {
+    console.warn(`${LOG_PREFIX} DeleteTask bloqueado`, {
+      reason: !email ? "sem_email_logado" : "task_id_vazio"
+    });
+    return false;
+  }
+
+  const db = readDB();
+  const user = ensureUser(db, email);
+  const previousLength = user.tasks.length;
+  user.tasks = user.tasks.filter((task) => task.id !== taskId);
+  const removed = user.tasks.length !== previousLength;
+
+  if (removed) {
+    writeDB(db);
+    console.log(`${LOG_PREFIX} DeleteTask done`, { taskId });
+  } else {
+    console.warn(`${LOG_PREFIX} DeleteTask task nao encontrada`, { taskId });
+  }
+
+  return removed;
+}
+
+function escapeHTML(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function selectTask(taskId) {
+  if (!taskId) return false;
+  selectedTaskId = taskId;
+  console.log(`${LOG_PREFIX} selectTask`, { selectedTaskId });
+  return true;
+}
+
+function openEditForTask(taskId) {
+  const email = getLoggedEmail();
+  if (!email || !selectTask(taskId)) return;
+
+  const db = readDB();
+  const user = ensureUser(db, email);
+  const task = user.tasks.find((item) => item.id === taskId);
+  if (!task) return;
+
+  const textInput = document.getElementById("edit_text_task");
+  const dateInput = document.getElementById("edit_date_task");
+  const priorityInput = document.getElementById("edit_priority");
+  const filterInput = document.getElementById("edit_filter_task");
+  if (!textInput || !dateInput || !priorityInput || !filterInput) return;
+
+  textInput.value = task.text;
+  dateInput.value = task.date;
+  priorityInput.value = task.priority;
+  filterInput.value = task.filterId || "";
+
+  openEdit();
+}
+
+function openDeleteForTask(taskId) {
+  if (!selectTask(taskId)) return;
+  openDelete();
+}
+
+function renderTasks() {
+  console.log(`${LOG_PREFIX} renderTasks start`);
+  const email = getLoggedEmail();
+  if (!email) {
+    console.warn(`${LOG_PREFIX} renderTasks cancelado`, { reason: "sem_email_logado" });
+    return;
+  }
 
   const db = readDB();
   const user = ensureUser(db, email);
   const list = document.querySelector(".container-list");
-  if (!list) return;
+  if (!list) {
+    console.warn(`${LOG_PREFIX} renderTasks cancelado`, { reason: "lista_nao_encontrada" });
+    return;
+  }
 
   list.innerHTML = "";
 
   user.tasks.forEach((task) => {
     const filter = user.filters.find((f) => f.id === task.filterId);
     const filterName = filter ? filter.name : "Sem filtro";
+    const priority = task.priority.charAt(0).toUpperCase() + task.priority.slice(1);
 
-    list.innerHTML = `
+    list.innerHTML += `
     <li>
                     <div class="card-task-top">
-                        <p>${task.priority}</p>
-                        <p>${filterName}</p>
+                        <p>${escapeHTML(priority)}</p>
+                        <p>${escapeHTML(filterName)}</p>
                     </div>
-                    <h2>${task.text}</h2>
+                    <h2>${escapeHTML(task.text)}</h2>
                     <div class="buttons-crud">
                         <button id="finalizar-task" type="button">Finalizar</button>
-                        <button id="edit-task" type="button" onclick="openEdit()">
+                        <button id="edit-task" type="button" data-action="edit" data-task-id="${task.id}">
                             <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M12.839 1.5675C13.0144 0.810902 14.0913 0.810903 14.2667 1.5675C14.7604 3.69877 17.4336 4.41524 18.9269 2.81653C19.4571 2.24876 20.3907 2.78735 20.1642 3.5304C19.526 5.62305 21.4827 7.57967 23.5753 6.94153C24.3184 6.71502 24.857 7.64862 24.2892 8.17883C22.6905 9.67208 23.4069 12.3453 25.5382 12.839C26.2948 13.0144 26.2948 14.0913 25.5382 14.2667C23.4069 14.7604 22.6905 17.4336 24.2892 18.9269C24.8569 19.4571 24.3184 20.3907 23.5753 20.1642C21.4827 19.526 19.526 21.4827 20.1642 23.5753C20.3907 24.3184 19.4571 24.8569 18.9269 24.2892C17.4336 22.6905 14.7604 23.4069 14.2667 25.5382C14.0913 26.2948 13.0144 26.2948 12.839 25.5382C12.3453 23.4069 9.67208 22.6905 8.17883 24.2892C7.64862 24.8569 6.71502 24.3184 6.94153 23.5753C7.57967 21.4827 5.62305 19.526 3.5304 20.1642C2.78735 20.3907 2.24876 19.4571 2.81653 18.9269C4.41524 17.4336 3.69878 14.7604 1.5675 14.2667C0.810902 14.0913 0.810903 13.0144 1.5675 12.839C3.69877 12.3453 4.41524 9.67208 2.81653 8.17883C2.24876 7.64862 2.78735 6.71502 3.5304 6.94153C5.62304 7.57967 7.57967 5.62304 6.94153 3.5304C6.71502 2.78735 7.64862 2.24876 8.17883 2.81653C9.67208 4.41524 12.3453 3.69878 12.839 1.5675Z" stroke="black" stroke-width="2"/>
                             </svg>
                         </button>
-                        <button id="remove-task" type="button" onclick="openDelete()">
+                        <button id="remove-task" type="button" data-action="delete" data-task-id="${task.id}">
                             <svg width="30" height="32" viewBox="0 0 30 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M1.12695 7.16663H28.873L26.1133 30.1666H3.88672L1.12695 7.16663Z" stroke="#FF7678" stroke-width="2"/>
                                 <path d="M12.1934 1.51172C12.286 1.37303 12.4074 1.26022 12.5449 1.1748C12.4193 1.27729 12.3013 1.38964 12.1934 1.51172ZM17.4541 1.1748C17.5922 1.2604 17.7138 1.37347 17.8066 1.5127L17.8086 1.51562C17.6997 1.39215 17.5811 1.27831 17.4541 1.1748Z" stroke="#FF7678" stroke-width="2"/>
@@ -157,26 +346,106 @@ function renderTasks() {
                     </div>
                 </li>
     `;
-    list.appendChild();
   });
+  console.log(`${LOG_PREFIX} renderTasks done`, { total: user.tasks.length });
 }
 
 
-document.getElementById("add_filter_form").addEventListener("submit", (e) => {
-  e.preventDefault();
-  const input = document.getElementById("name_filter_add");
-  const filter = AddFilter(input.value);
-  if (filter) {
-    input.value = "";
-    renderFilterSelect();
-  }
-});
 
-document.getElementById("add_task_form").addEventListener("submit", (e) => {
-  e.preventDefault();
-  const created = AddTask();
-  if (created) {
-    e.target.reset();
+const addFilterForm = document.getElementById("add_filter_form");
+if (addFilterForm) {
+  console.log(`${LOG_PREFIX} add_filter_form encontrado`);
+  addFilterForm.addEventListener("submit", (e) => {
+    console.log(`${LOG_PREFIX} submit add_filter_form`);
+    e.preventDefault();
+    const input = document.getElementById("name_filter_add");
+    const filter = AddFilter(input.value);
+    if (filter) {
+      input.value = "";
+      renderFilterSelect();
+    }
+  });
+} else {
+  console.warn(`${LOG_PREFIX} add_filter_form nao encontrado`);
+}
+
+const addTaskForm = document.getElementById("add_task_form");
+if (addTaskForm) {
+  console.log(`${LOG_PREFIX} add_task_form encontrado`);
+  addTaskForm.addEventListener("submit", (e) => {
+    console.log(`${LOG_PREFIX} submit add_task_form`);
+    e.preventDefault();
+    const created = AddTask();
+    if (created) {
+      e.target.reset();
+      renderTasks();
+    }
+  });
+} else {
+  console.warn(`${LOG_PREFIX} add_task_form nao encontrado`);
+}
+
+const taskList = document.querySelector(".container-list");
+if (taskList) {
+  taskList.addEventListener("click", (e) => {
+    const button = e.target.closest("button[data-action]");
+    if (!button) return;
+
+    const taskId = button.dataset.taskId;
+    if (!taskId) return;
+
+    if (button.dataset.action === "edit") {
+      openEditForTask(taskId);
+      return;
+    }
+
+    if (button.dataset.action === "delete") {
+      openDeleteForTask(taskId);
+    }
+  });
+}
+
+const editTaskForm = document.getElementById("edit_task_form");
+if (editTaskForm) {
+  editTaskForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (!selectedTaskId) return;
+
+    const text = document.getElementById("edit_text_task").value;
+    const date = document.getElementById("edit_date_task").value;
+    const priority = document.getElementById("edit_priority").value;
+    const filterId = document.getElementById("edit_filter_task").value || null;
+
+    const updated = UpdateTask(selectedTaskId, { text, date, priority, filterId });
+    if (!updated) return;
+
     renderTasks();
-  }
-});
+    closeAll();
+    selectedTaskId = null;
+  });
+}
+
+const acceptDeleteBtn = document.getElementById("accept_delete");
+if (acceptDeleteBtn) {
+  acceptDeleteBtn.addEventListener("click", () => {
+    if (!selectedTaskId) return;
+    const removed = DeleteTask(selectedTaskId);
+    if (!removed) return;
+
+    renderTasks();
+    closeAll();
+    selectedTaskId = null;
+  });
+}
+
+const declineDeleteBtn = document.getElementById("decline_delete");
+if (declineDeleteBtn) {
+  declineDeleteBtn.addEventListener("click", () => {
+    selectedTaskId = null;
+    closeAll();
+  });
+}
+
+console.log(`${LOG_PREFIX} init render`);
+renderFilterSelect();
+renderTasks();

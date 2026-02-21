@@ -66,43 +66,55 @@
     </header>
     <main id="app">
         <section class="add-panel">
-            <ul>
-                <li><button></button></li>
-                <li><button></button></li>
+            <ul class="view-buttons">
+                <li><button onclick="ViewAddTask()">Tarefas</button></li>
+                <li><button onclick="ViewAddFilter()">Filtros</button></li>
             </ul>
-            <form action="" id="">
+            <button class="close-button" onclick="closeAll()">X</button>
+            <form action="" id="add_task_form">
                 <input type="text" name="" id="add_text_task">
                 <input type="date" name="" id="add_date_task">
                 <select name="" id="add_priority">
                     <option value="alta">Alta</option>
                     <option value="media">Media</option> 
-                    <option value="baixa">Baixa</option>                        <option value="">Baixa</option>
+                    <option value="baixa">Baixa</option>
                 </select>
                 <select name="" id="add_filter_task">
                     
                 </select>
+                <input type="submit" value="Adicionar Tarefa">
             </form>
-            <form action="" id="">
+            <form action="" id="add_filter_form">
                 <input type="text" id="name_filter_add">
-                <input type="submit" value="Adicionar Filtro">
+                <input type="submit" value="+">
+                <ul id="filter-list" class="filter-list"></ul>
             </form>
         </section>
         <section class="edit-panel">
-            <form action="">
-                <input type="text" name="" id="">
-                <input type="date" name="" id="">
-                <select name="" id="">
-                    <option value="">Alta</option>
-                    <option value="">Media</option>
-                    <option value="">Baixa</option>
+            <button class="close-button" onclick="closeAll()">X</button>
+            <form action="" id="edit_task_form">
+                <input type="text" name="" id="edit_text_task">
+                <input type="date" name="" id="edit_date_task">
+                <select name="" id="edit_priority">
+                    <option value="alta">Alta</option>
+                    <option value="media">Media</option>
+                    <option value="baixa">Baixa</option>
                 </select>
-                <select name="" id="">
+                <select name="" id="edit_filter_task">
                     
                 </select>
+                <input type="submit" value="Editar ">
             </form>
-            <button>Adicionar</button>
+            
         </section>
-        <div class="delete-warning"></div>
+        <div class="delete-warning">
+            <button class="close-button" onclick="closeAll()">X</button>
+            <p>Deseja deletar essa tarefa?</p>
+            <div>
+                <button id="accept_delete">Sim</button>
+                <button id="decline_delete">Não</button>
+            </div>
+        </div>
         <section class="container-task move-bottom">
             <h1 class="component-task container-title">TAREFAS</h1>
             <div class="component-task buttons-top">
@@ -208,6 +220,7 @@
     </main>
     <script src="../js/theme.js" defer></script>
     <script src="../js/logout.js" defer></script>
-    <script src="../js/crud-task.js" defer></script>
+    <script src="../js/button_task.js" defer></script>
+    <script src="../js/task.js" defer></script>
 </body>
 </html>
